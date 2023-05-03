@@ -104,13 +104,10 @@ def webhook():
         else:
             response_text = f"Great news! Your order has shipped! Here's the tracking information: \n{tracking_link}"
         response_text += "\n\n Is there anything else I can help you with?"
-        response = {
-            "fulfillmentText": response_text,
-            "source": "webhook"
-        }
     else:
-        response = {"fulfillmentText": "I'm sorry, I don't understand. Could you provide more information?"}
-        
+        response_text = "I'm sorry, I don't understand. Could you provide more information?"
+    
+    response = { "fulfillmentText": response_text  }
     return jsonify(response)
 
 if __name__ == '__main__':
