@@ -1,7 +1,7 @@
 import os
-import json
 import requests
-from flask import Flask, request, jsonify
+import datetime
+from flask import Flask, request
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -10,7 +10,6 @@ client_id = os.getenv("BIGCOMMERCE_CLIENT_ID")
 access_token = os.getenv("BIGCOMMERCE_ACCESS_TOKEN")
 store_hash = os.getenv("BIGCOMMERCE_STORE_HASH")
 
-# Define the BigCommerce API endpoints
 base_url = f"https://api.bigcommerce.com/stores/{store_hash}"
 orders_url = f"{base_url}/v2/orders"
 
@@ -20,7 +19,6 @@ def get_tracking_number_by_order_id(order_id):
             "X-Auth-Client": client_id,
             "X-Auth-Token": access_token
         })
-    # print(f'url:  {orders_url}/{order_id}/shipments')
     print(f'tracking > order_id:  {order_id}')
     print(f'shipments.status_code{shipments.status_code}')
     if shipments.status_code != 200:
@@ -60,8 +58,7 @@ def get_order_status_by_email(email):
         "X-Auth-Token": access_token
     })
     print(f'email: {email}')
-    print('email: status code')
-    print(response.status_code)
+    print(f'email: status code {response.status_code}')
     if response.status_code != 200:
         return None, None
 
@@ -77,13 +74,11 @@ def get_order_status_by_email(email):
 # Define a webhook endpoint for Dialog Flow
 @app.route("/", methods=["GET"])
 def index():
-    return "Hey"
+    return f"Hey there! I'm a webhook."
 
 # Define a webhook endpoint for Dialog Flow
 @app.route("/webhook", methods=["POST"])
 def webhook():
-    data = request.get_json()
-
     req = request.get_json(force=True)
     action = req.get("queryResult").get("action")
     if action == "check_order_status":
@@ -91,12 +86,16 @@ def webhook():
         order_id = parameters.get("order_id") if parameters.get("order_id") else None
         email = parameters.get("email") if "email" in parameters else None
         if (order_id is not None):
+            print(f'webhook > order_id: {order_id}')
             order_status, tracking_link = get_order_status_by_order_id(order_id)
         elif(email is not None):
+            print(f'webhook > email requested: {email}')
             order_status, tracking_link = get_order_status_by_email(email)
         # ---
-        print('webhook > order_status,', 'tracking_link')
-        print(order_status, ',', tracking_link)
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        print(f"Webhook :: requested at {now} ")
+        print('webhook > order_status, tracking_link')
+        print(f"{order_status}, {tracking_link}")
         if tracking_link is None:
             if order_status is None:
                 response_text = "I'm sorry, I couldn't find any shipping information for that order."
@@ -112,7 +111,7 @@ def webhook():
         response_text = "I'm sorry, I don't understand. Could you provide more information?"
     
     response = { "fulfillmentText": response_text  }
-    return jsonify(response)
+    return response
 
 if __name__ == '__main__':
     app.run(debug=True)
