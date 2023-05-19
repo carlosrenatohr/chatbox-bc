@@ -1,14 +1,11 @@
 import os
 import json
-import openai
 import requests
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 
 load_dotenv()
 app = Flask(__name__)
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 client_id = os.getenv("BIGCOMMERCE_CLIENT_ID")
 access_token = os.getenv("BIGCOMMERCE_ACCESS_TOKEN")
 store_hash = os.getenv("BIGCOMMERCE_STORE_HASH")
@@ -23,7 +20,7 @@ def get_tracking_number_by_order_id(order_id):
             "X-Auth-Client": client_id,
             "X-Auth-Token": access_token
         })
-    print(f'url:  {orders_url}/{order_id}/shipments')
+    # print(f'url:  {orders_url}/{order_id}/shipments')
     print(f'tracking > order_id:  {order_id}')
     print(f'shipments.status_code{shipments.status_code}')
     if shipments.status_code != 200:
@@ -33,7 +30,7 @@ def get_tracking_number_by_order_id(order_id):
     # carrier = first_shipment["tracking_carrier"]
     # tracking_link = f"https://www.{carrier.lower()}.com/tracking/{tracking_info}"
     tracking_link = f"https://www.aftership.com/track/ups/{tracking_info}"
-    print(tracking_link)
+    print(f'tracking > tracking_link:  {tracking_link}')
     return tracking_link
 
 # Define a function to check if an order has shipped and get the tracking information
@@ -93,6 +90,8 @@ def webhook():
         elif(email is not None):
             order_status, tracking_link = get_order_status_by_email(email)
         # ---
+        print('webhook > order_status,', 'tracking_link')
+        print(order_status, ',', tracking_link)
         if tracking_link is None:
             if order_status is None:
                 response_text = "I'm sorry, I couldn't find any shipping information for that order."
