@@ -75,6 +75,11 @@ def get_order_status_by_email(email):
     return order["status"], tracking_link
 
 # Define a webhook endpoint for Dialog Flow
+@app.route("/", methods=["GET"])
+def index():
+    return "Hey"
+
+# Define a webhook endpoint for Dialog Flow
 @app.route("/webhook", methods=["POST"])
 def webhook():
     data = request.get_json()
