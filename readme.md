@@ -77,7 +77,7 @@ Add Heroku remote to git
 ```
 
 
-Deploy to Heroku
+### Deploy to Heroku
 
 For new changes, what you need to do is add the changes to git, commit them and push them to Heroku remote.
 
@@ -106,3 +106,48 @@ You can check the logs of the app running on Heroku with the following command:
 OR 
     
 Checking the logs on the [Heroku dashboard](https://dashboard.heroku.com/apps/chatbox-b2c-lambda/logs) of the app.
+
+## Deploying to AWS Lambda through Serverless Framework :cloud: (Alternative to Heroku)
+
+You can deploy the app to AWS Lambda with the following command:
+
+Install Serverless Framework
+```bash
+npm install -g serverless
+```
+
+Make sure you have the AWS CLI installed and configured with the right credentials. For the project, a `serverless` profile was created in the AWS account so you can obtain the credentials from there and set them up with the following command:
+
+```bash
+config credentials --provider aws --key {API-KEY} --secret {SECRET-VALUE})+fSr0omCOcjjuIXIBvm87T3O8tF6 --overwrite
+```
+
+
+### Deploy to AWS Lambda
+
+For new changes, what you need to do is add the changes to git, commit them and push them. 
+
+```bash
+  git add .
+  git commit -m "Deploy to AWS Lambda"
+```
+
+Then, try to deploy the app with the following command:
+
+```
+  serverless deploy
+```
+
+In case you get an error, follow the next steps:
+
+1. Check the logs with the following command:
+
+```bash
+  serverless logs -f app
+```
+
+2. Check the logs on the [AWS Lambda dashboard](https://console.aws.amazon.com/lambda/home?region=us-east-1#/functions/chatbox-b2c-lambda?tab=monitoring) of the app.
+
+3. Check this guide to understand the steps applied for this project: [Serverless Flask](https://www.serverless.com/blog/flask-python-rest-api-serverless-lambda-dynamodb)
+
+
